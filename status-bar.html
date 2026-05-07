@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界书状态栏 - Rose & White</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 玫瑰红和白色配色方案 */
+        :root {
+            --rose-primary: #e91e63;      /* 玫瑰红主色 */
+            --rose-light: #f50057;        /* 浅玫瑰红 */
+            --rose-pale: #ff69b4;         /* 浅粉红 */
+            --rose-very-pale: #ffc0cb;   /* 极浅粉红 */
+            --white-main: #ffffff;        /* 纯白 */
+            --white-cream: #f8f8f8;       /* 奶油白 */
+            --text-dark: #4a4a4a;         /* 深灰文本 */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--white-cream) 0%, rgba(255, 192, 203, 0.1) 100%);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 呼吸发光动画 */
+        @keyframes pulse-glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px var(--rose-primary)) drop-shadow(0 0 4px rgba(233, 30, 99, 0.5));
+                opacity: 0.8;
+                transform: scale(0.98);
+            }
+            50% {
+                filter: drop-shadow(0 0 16px var(--rose-primary)) drop-shadow(0 0 8px var(--rose-light));
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 流光动画 */
+        @keyframes flow-dash {
+            from {
+                stroke-dashoffset: 3000;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* 能量抖动 */
+        @keyframes energy-flicker {
+            0%, 100% {
+                opacity: 0.9;
+                filter: brightness(1.4) contrast(1.1);
+            }
+            50% {
+                opacity: 0.6;
+                filter: brightness(1.0) contrast(0.9);
+            }
+        }
+
+        /* 白色闪烁 */
+        @keyframes flicker-white {
+            0%, 100% {
+                opacity: 1;
+                filter: brightness(3);
+            }
+            50% {
+                opacity: 0.3;
+                filter: brightness(1.1);
+            }
+        }
+
+        .animate-pulse-glow {
+            animation: pulse-glow 3.5s ease-in-out infinite;
+            transform-origin: center center;
+        }
+
+        .animate-flow-charging {
+            animation: flow-dash 4s linear infinite;
+        }
+
+        .animate-flow-bloom {
+            animation: flow-dash 0.7s linear infinite;
+        }
+
+        .animate-energy-flicker {
+            animation: energy-flicker 0.4s ease-in-out infinite;
+        }
+
+        .animate-flicker-white {
+            animation: flicker-white 0.3s ease-in-out infinite;
+        }
+
+        /* 玻璃态卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(233, 30, 99, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(233, 30, 99, 0.1);
+            transition: all 0.3s ease;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(233, 30, 99, 0.4);
+            box-shadow: 0 12px 48px rgba(233, 30, 99, 0.15);
+            transform: translateY(-4px);
+        }
+
+        /* 状态卡片标题 */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--rose-very-pale);
+        }
+
+        .card-header-icon {
+            font-size: 24px;
+            color: var(--rose-primary);
+            animation: pulse-glow 3.5s ease-in-out infinite;
+        }
+
+        .card-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--rose-primary);
+        }
+
+        /* 状态项 */
+        .status-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(233, 30, 99, 0.1);
+            align-items: start;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: var(--rose-primary);
+            font-size: 14px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-value {
+            color: var(--text-dark);
+            font-size: 14px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .status-value.highlight {
+            color: var(--rose-primary);
+            font-weight: 500;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(233, 30, 99, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--rose-primary), var(--rose-light));
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+        }
+
+        /* SVG 流光线 */
+        .flow-svg {
+            margin-top: 12px;
+            opacity: 0.6;
+        }
+
+        .flow-line {
+            stroke: var(--rose-primary);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 3000;
+        }
+
+        /* 响应式布局 */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--rose-primary), var(--rose-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .sub-title {
+            font-size: 14px;
+            color: #999;
+            letter-spacing: 2px;
+        }
+
+        /* 数据输入区 */
+        .input-section {
+            glass-card;
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
+
+        .textarea-input {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 2px solid rgba(233, 30, 99, 0.2);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .textarea-input:focus {
+            outline: none;
+            border-color: var(--rose-primary);
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.1);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--rose-primary), var(--rose-light));
+            color: white;
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            background: rgba(233, 30, 99, 0.1);
+            color: var(--rose-primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 6px;
+            margin-top: 4px;
+            border: 1px solid rgba(233, 30, 99, 0.2);
+        }
+
+        /* 网格布局 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            color: rgba(233, 30, 99, 0.2);
+            margin-bottom: 12px;
+        }
+
+        /* 分隔线 */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--rose-very-pale), transparent);
+            margin: 20px 0;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(233, 30, 99, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(233, 30, 99, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(233, 30, 99, 0.4);
+        }
+
+        /* 打印样式 */
+        @media print {
+            body {
+                background: white;
+            }
+            .input-section {
+                display: none;
+            }
+        }
+
+        /* 移动响应 */
+        @media (max-width: 600px) {
+            .main-title {
+                font-size: 24px;
+            }
+            .glass-card {
+                padding: 16px;
+            }
+            .status-item {
+                grid-template-columns: 80px 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题区 -->
+        <div class="title-section">
+            <h1 class="main-title">✨ 世界书状态栏 ✨</h1>
+            <p class="sub-title">ROSE & WHITE THEME</p>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="glass-card input-section">
+            <div class="card-header">
+                <i class="fas fa-file-upload card-header-icon"></i>
+                <span class="card-header-title">导入数据</span>
+            </div>
+            <textarea class="textarea-input" id="jsonInput" placeholder="粘贴你的JSON数据或文本内容...">
+            </textarea>
+            <button class="btn btn-primary" onclick="parseAndDisplay()">
+                <i class="fas fa-magic"></i> 解析并显示
+            </button>
+            <button class="btn btn-primary" onclick="loadSampleData()">
+                <i class="fas fa-file"></i> 加载示例
+            </button>
+        </div>
+
+        <!-- 状态显示区 -->
+        <div id="statusContainer"></div>
+    </div>
+
+    <script>
+        /**
+         * 状态栏数据解析器
+         * 使用正则表达式提取和处理世界书数据
+         */
+        class StatusBarParser {
+            constructor() {
+                // 定义状态栏字段的正则表达式模式
+                this.patterns = {
+                    hairStyle: /💇‍♀️\s*发型:\s*(.+?)(?=\n|💄)/,
+                    makeup: /💄\s*妆容:\s*(.+?)(?=\n|👼)/,
+                    expression: /👼\s*面部表情:\s*(.+?)(?=\n|👗)/,
+                    outfit: /👗\s*今日穿着:\s*(.+?)(?=\n|🥵)/,
+                    lips: /🥵\s*双唇和口腔状态:\s*(.+?)(?=\n|🍈)/,
+                    chest: /🍈\s*酥胸状态:\s*(.+?)(?=\n|🖐)/,
+                    hands: /🖐\s*玉手状态:\s*(.+?)(?=\n|🦿)/,
+                    legs: /🦿\s*美腿状态:\s*(.+?)(?=\n|🧦)/,
+                    socks: /🧦\s*丝袜状态:\s*(.+?)(?=\n|🩰)/,
+                    feet: /🩰\s*玉足气味:\s*(.+?)(?=\n|💔)/,
+                    psychological: /💔\s*心理状态:\s*(.+?)(?=\n|🧝)/,
+                    physical: /🧝‍♀️\s*身体状态:\s*(.+?)(?=\n|🏠)/,
+                    userLocation: /🏠.*?位置:\s*(.+?)(?=\n|🤰)/,
+                    pregnant: /🤰\s*怀孕状态:\s*(.+?)(?=\n|🍑)/,
+                    moralBottom: /📏\s*道德底线:\s*(.+?)(?=\n|👫)/,
+                    relationship: /👫\s*当前关系:\s*(.+?)(?=\n|╘)/,
+                    // 通用提取器
+                    content: /『(.+?)』/,
+                    timestamp: /(\d{4}-\d{2}-\d{2})\s*-\s*(\d{2}:\d{2})/,
+                };
+            }
+
+            /**
+             * 从文本中提取匹配的值
+             * @param {string} text - 输入文本
+             * @param {RegExp} pattern - 正则表达式模式
+             * @returns {string} 提取到的值，如果没有则返回空字符串
+             */
+            extract(text, pattern) {
+                const match = text.match(pattern);
+                return match ? match[1].trim() : '';
+            }
+
+            /**
+             * 解析完整的状态数据
+             * @param {string} input - 输入内容
+             * @returns {object} 解析后的状态对象
+             */
+            parse(input) {
+                const data = {
+                    hairStyle: this.extract(input, this.patterns.hairStyle),
+                    makeup: this.extract(input, this.patterns.makeup),
+                    expression: this.extract(input, this.patterns.expression),
+                    outfit: this.extract(input, this.patterns.outfit),
+                    lips: this.extract(input, this.patterns.lips),
+                    chest: this.extract(input, this.patterns.chest),
+                    hands: this.extract(input, this.patterns.hands),
+                    legs: this.extract(input, this.patterns.legs),
+                    socks: this.extract(input, this.patterns.socks),
+                    feet: this.extract(input, this.patterns.feet),
+                    psychological: this.extract(input, this.patterns.psychological),
+                    physical: this.extract(input, this.patterns.physical),
+                    userLocation: this.extract(input, this.patterns.userLocation),
+                    pregnant: this.extract(input, this.patterns.pregnant),
+                    moralBottom: this.extract(input, this.patterns.moralBottom),
+                    relationship: this.extract(input, this.patterns.relationship),
+                };
+                return data;
+            }
+
+            /**
+             * 生成HTML卡片
+             * @param {object} data - 状态数据
+             * @returns {string} HTML字符串
+             */
+            generateHTML(data) {
+                let html = '<div class="glass-card animate-pulse-glow">';
+                html += '<div class="card-header">';
+                html += '<i class="fas fa-heart card-header-icon animate-flicker-white"></i>';
+                html += '<span class="card-header-title">角色状态</span>';
+                html += '</div>';
+
+                // 外观信息
+                html += this.createSection('外观信息', [
+                    { label: '💇‍♀️ 发型', value: data.hairStyle || '未设置' },
+                    { label: '💄 妆容', value: data.makeup || '未设置' },
+                    { label: '👼 表情', value: data.expression || '未设置' },
+                    { label: '👗 穿着', value: data.outfit || '未设置' }
+                ]);
+
+                // 身体状态
+                html += this.createSection('身体状态', [
+                    { label: '🥵 口腔', value: data.lips || '未设置' },
+                    { label: '🍈 酥胸', value: data.chest || '未设置' },
+                    { label: '🖐 玉手', value: data.hands || '未设置' },
+                    { label: '🦿 美腿', value: data.legs || '未设置' },
+                    { label: '🧦 丝袜', value: data.socks || '未设置' },
+                    { label: '🩰 玉足', value: data.feet || '未设置' }
+                ]);
+
+                // 心理和关系
+                html += this.createSection('心理状态', [
+                    { label: '💔 心理', value: data.psychological || '未设置' },
+                    { label: '🧝‍♀️ 身体', value: data.physical || '未设置' },
+                    { label: '🤰 怀孕', value: data.pregnant || '未设置' }
+                ]);
+
+                // 社会关系
+                html += this.createSection('社会关系', [
+                    { label: '👫 关系', value: data.relationship || '未设置' },
+                    { label: '📏 底线', value: data.moralBottom || '未设置' },
+                    { label: '🏠 位置', value: data.userLocation || '未设置' }
+                ]);
+
+                html += '</div>';
+                return html;
+            }
+
+            /**
+             * 创建信息区段
+             * @param {string} title - 区段标题
+             * @param {array} items - 项目数组
+             * @returns {string} HTML字符串
+             */
+            createSection(title, items) {
+                let html = '<div style="margin-top: 20px;">';
+                html += `<h3 style="font-size: 14px; color: var(--rose-primary); font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">`;
+                html += `<i class="fas fa-star" style="color: var(--rose-pale);"></i>${title}`;
+                html += `</h3>`;
+
+                items.forEach(item => {
+                    if (item.value && item.value !== '未设置') {
+                        html += `<div class="status-item">`;
+                        html += `<div class="status-label">${item.label}</div>`;
+                        html += `<div class="status-value">${this.sanitize(item.value)}</div>`;
+                        html += `</div>`;
+                    }
+                });
+
+                html += '</div>';
+                return html;
+            }
+
+            /**
+             * 清理HTML字符串以防止XSS
+             * @param {string} str - 输入字符串
+             * @returns {string} 清理后的字符串
+             */
+            sanitize(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+        }
+
+        // 全局解析器实例
+        const parser = new StatusBarParser();
+
+        /**
+         * 解析并显示数据
+         */
+        function parseAndDisplay() {
+            const input = document.getElementById('jsonInput').value;
+            if (!input.trim()) {
+                alert('请输入数据');
+                return;
+            }
+
+            let content = input;
+
+            // 尝试解析JSON
+            try {
+                const jsonData = JSON.parse(input);
+                if (jsonData.entries && jsonData.entries['0']) {
+                    content = jsonData.entries['0'].content;
+                }
+            } catch (e) {
+                // 不是JSON，直接作为文本处理
+            }
+
+            // 解析内容
+            const data = parser.parse(content);
+
+            // 检查是否有任何有效数据
+            const hasData = Object.values(data).some(v => v && v !== '未设置');
+
+            if (!hasData) {
+                const container = document.getElementById('statusContainer');
+                container.innerHTML = `
+                    <div class="glass-card">
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
+                            <p>没有识别到有效数据，请检查格式</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 生成HTML卡片
+            const html = parser.generateHTML(data);
+            document.getElementById('statusContainer').innerHTML = html;
+
+            // 平滑滚动到结果
+            setTimeout(() => {
+                document.getElementById('statusContainer').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        /**
+         * 加载示例数据
+         */
+        function loadSampleData() {
+            const sample = `『2026-05-07 - 15:30 - 房间』
+艾丽
+╒═════
+💇‍♀️ 发型: 长卷发，蓬松感十足，用粉色蝴蝶结点缀
+💄 妆容: 眼妆精致，烟熏妆衬托出眼眸深邃，玫瑰红唇膏显得娇艳欲滴
+👼 面部表情: 轻咬下唇，眼神中带着些许娇羞和期待
+👗 今日穿着: 白色蕾丝吊带连衣裙，若隐若现的曲线
+🥵双唇和口腔状态: 玫瑰色润唇，微微张开，呼吸轻浅
+🍈酥胸状态: 随着呼吸微微起伏，蕾丝边界勾勒出完美曲线
+🖐玉手状态: 纤细的手指，指甲涂着同色系的粉色甲油，轻轻搭在腿上
+🦿美腿状态: 修长笔直，白皙肌肤在灯光下闪闪发亮
+🧦丝袜状态: 浅粉色透明丝袜，透出大片雪白肌肤，增添朦胧感
+🩰玉足气味: 清新怡人的香气，混合着淡淡的玫瑰香
+💔 心理状态: 既期待又忐忑，心里装满了对即将发生的事的遐想
+🧝‍♀️ 身体状态: 身体柔软，因为紧张而微微颤抖，每个细胞都在期待
+🏠用户位置: 房间
+🤰怀孕状态: 未怀孕
+📏道德底线: 愿意与用户发生亲密关系
+👫当前关系: 用户的秘密恋人
+╘═════`;
+
+            document.getElementById('jsonInput').value = sample;
+        }
+
+        /**
+         * 页面加载完成后的初始化
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加回车键快捷解析
+            document.getElementById('jsonInput').addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    parseAndDisplay();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
